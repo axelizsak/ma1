@@ -1,0 +1,12 @@
+# Python
+.venv/
+__pycache__/
+.DS_Store
+
+# Not in the repository for now: only the code is shared.
+# Remove a line below when we decide to add that part.
+data/
+outputs/
+prompts/
+decisions_log.md
+README.md

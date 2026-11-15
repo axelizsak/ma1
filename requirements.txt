@@ -1,0 +1,11 @@
+# Python packages used by the scripts in ma1/scripts
+pandas
+openpyxl
+emoji
+vaderSentiment
+textblob
+transformers
+torch
+statsmodels
+matplotlib
+scikit-learn
