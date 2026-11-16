@@ -126,6 +126,7 @@ NAMES = {
     "has_nonface": "Non-face emoji (at least one), for Brewhaus",
     "has_exclam": "Exclamation mark (at least one)",
     "vader_text_only": "Tone of the words (per +1 point of VADER)",
+    "roberta_score": "Tone of the post (per +1 point of RoBERTa)",
     "topic_emotional": "Topic Emotional (vs Informational)",
     "topic_mixed": "Topic Mixed (vs Informational)",
     "trailnorth:has_nonface": "Non-face emoji: extra effect for Trailnorth",
@@ -168,6 +169,14 @@ table = as_table(main)
 print(f"Outcome: log(like rate). Posts: {int(main.nobs)}. R2 = {main.rsquared:.2f} (adjusted {main.rsquared_adj:.2f}).")
 print(f"Baseline like rate: {np.exp(main.params['Intercept']):.2%}\n")
 print(table.round(3).to_string())
+
+# The full technical output of the model, as text (09_team_summary.py turns it into an image)
+READABLE = {"Intercept": "Intercept", "trailnorth": "Trailnorth", "has_face": "Face emoji",
+            "has_nonface": "Non-face emoji", "has_exclam": "Exclamation mark",
+            "vader_text_only": "Tone of words (VADER)", "topic_emotional": "Topic: Emotional",
+            "topic_mixed": "Topic: Mixed", "trailnorth:has_nonface": "Trailnorth x non-face"}
+technical = main.summary(yname="log(like rate)", xname=[READABLE[name] for name in main.model.exog_names])
+(ROOT / "outputs" / "regression_summary.txt").write_text(technical.as_text(), encoding="utf-8")
 
 # The non-face effect for each brand (for Trailnorth: main effect + interaction)
 trail = main.t_test("has_nonface + trailnorth:has_nonface = 0")
@@ -228,13 +237,15 @@ checks = {
     "Standard errors grouped by template": clustered,
     "log(likes) with log(views) as control": fit(reg, "log_like ~ " + MAIN + " + log_view"),
     "Without the 2 outliers": fit(no_outliers, "log_like_rate ~ " + MAIN),
+    # the 30 hand labels agree best with RoBERTa (73%) and poorly with VADER (37%): does the result depend on the tool?
+    "Tone measured with RoBERTa instead of VADER": fit(reg, "log_like_rate ~ " + MAIN.replace("vader_text_only", "roberta_score")),
     "With the 21 emoji-only posts": fit(with_emoji_only, "log_like_rate ~ " + MAIN),
     "Adding: post has a photo, video or gif": fit(reg_media, "log_like_rate ~ " + MAIN + " + has_media"),
     "Adding: brand x face emoji (5 Trailnorth posts!)": fit(reg, "log_like_rate ~ " + MAIN + " + trailnorth:has_face"),
     "Outcome: reply rate": fit(reg, "log_reply_rate ~ " + MAIN),
     "Outcome: retweet rate": fit(reg, "log_retweet_rate ~ " + MAIN),
 }
-show = ["has_face", "has_nonface", "trailnorth:has_nonface", "has_exclam", "vader_text_only",
+show = ["has_face", "has_nonface", "trailnorth:has_nonface", "has_exclam", "vader_text_only", "roberta_score",
         "topic_emotional", "topic_mixed", "trailnorth:has_face", "log_view"]
 rows = {}
 for name, model in checks.items():
