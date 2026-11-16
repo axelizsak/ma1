@@ -30,4 +30,4 @@ Put the course file `Main_Assignment_1_Dataset_2026-27.csv` one folder above `ma
 .venv/bin/python scripts/09_team_summary.py
 ```
 
-The first run downloads two Hugging Face models (about 2 GB). The AI topic step reads `prompts/topic_prompt.md`, which is not in this repository yet.
+The first run downloads two Hugging Face models (about 2 GB).
