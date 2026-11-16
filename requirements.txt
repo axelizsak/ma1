@@ -9,3 +9,4 @@ torch
 statsmodels
 matplotlib
 scikit-learn
+reportlab
